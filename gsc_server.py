@@ -1668,7 +1668,18 @@ def main():
     if transport == "stdio":
         mcp.run(transport="stdio")
     elif transport in {"sse", "http"}:
-        mcp.run(transport="sse", host=host, port=port)
+        # mcp SDK >= 1.27 removed the host/port kwargs from run() (they must be
+        # set on mcp.settings instead) and enabled DNS-rebinding protection with
+        # a Host allowlist of localhost only — which 421s the remote/Docker
+        # binding the operator explicitly opted into via MCP_HOST. Disable that
+        # check for the documented remote path. See issues #30 and #33.
+        mcp.settings.host = host
+        mcp.settings.port = port
+        try:
+            mcp.settings.transport_security.enable_dns_rebinding_protection = False
+        except Exception:
+            pass
+        mcp.run(transport="sse")
     else:
         raise ValueError(
             f"Unknown MCP_TRANSPORT '{transport}'. "
