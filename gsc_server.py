@@ -102,7 +102,7 @@ if _raw_data_state not in ("all", "final"):
     )
 DATA_STATE = _raw_data_state
 
-SCOPES = ["https://www.googleapis.com/auth/webmasters"]
+SCOPES = ["https://www.googleapis.com/auth/webmasters.readonly"]
 
 def get_gsc_service():
     """
